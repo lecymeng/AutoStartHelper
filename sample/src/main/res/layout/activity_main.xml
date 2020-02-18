@@ -11,6 +11,8 @@
         android:id="@+id/rlAutoStart"
         android:layout_width="0dp"
         android:layout_height="64dp"
+        android:background="#D9D9D9"
+        android:foreground="?attr/selectableItemBackground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -22,7 +24,8 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginEnd="16dp"
-            android:checked="false" />
+            android:checked="false"
+            android:clickable="false" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvAutoStart"
@@ -34,7 +37,7 @@
             android:paddingEnd="16dp"
             android:text="自启权限"
             android:textColor="#212121"
-            android:textSize="24sp"
+            android:textSize="20sp"
             tools:ignore="HardcodedText" />
     </RelativeLayout>
 
