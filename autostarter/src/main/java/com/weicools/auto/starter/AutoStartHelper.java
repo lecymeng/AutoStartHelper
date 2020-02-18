@@ -64,11 +64,9 @@ public class AutoStartHelper {
   private static final String BRAND_HUAWEI_HONOR = "honor";
   private static final String PACKAGE_HUAWEI_MAIN = "com.huawei.systemmanager";
   // 华为手机管家 自启管理页面 -> 打开允许自启动
-  private static final String TITLE_HUAWEI_STARTUP = "自启管理";
   private static final String COMPONENT_HUAWEI_STARTUP = "com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity";
   private static final String COMPONENT_HUAWEI_BOOST_START = "com.huawei.systemmanager.optimize.bootstart.BootStartActivity";
   // 华为手机管家 锁屏清理应用页面 -> 关闭锁屏清理
-  private static final String TITLE_HUAWEI_PROTECT = "锁屏清理应用";
   private static final String COMPONENT_HUAWEI_PROTECT = "com.huawei.systemmanager.optimize.process.ProtectActivity";
 
   /**
@@ -78,7 +76,6 @@ public class AutoStartHelper {
   private static final String BRAND_XIAOMI_REDMI = "redmi";
   private static final String PACKAGE_XIAOMI_MAIN = "com.miui.securitycenter";
   // 小米安全中心 自启动管理页面(路径: 授权管理 -> 自启动管理) -> 允许应用自启动
-  private static final String TITLE_XIAOMI_AUTO_START = "自启动管理";
   private static final String COMPONENT_XIAOMI_AUTO_START = "com.miui.permcenter.autostart.AutoStartManagementActivity";
 
   /**
@@ -87,7 +84,6 @@ public class AutoStartHelper {
    */
   private static final String BRAND_OPPO = "oppo";
   private static final String PACKAGE_COLOROS_MAIN = "com.coloros.safecenter";
-  private static final String TITLE_OPPO_COLOROS_STARTUP = "";
   private static final String COMPONENT_COLOROS_STARTUP = "com.coloros.safecenter.permission.startup.StartupAppListActivity";
   private static final String COMPONENT_COLOROS_STARTUP_APP = "com.coloros.safecenter.startupapp.StartupAppListActivity";
   private static final String PACKAGE_OPPO_MAIN = "com.oppo.safe";
@@ -100,8 +96,6 @@ public class AutoStartHelper {
    */
   private static final String BRAND_VIVO = "vivo";
   private static final String PACKAGE_IQOO_MAIN = "com.iqoo.secure";
-  private static final String TITLE_VIVO_IQOO_STARTUP = "";
-  private static final String TITLE_VIVO_IQOO_WHITE_LIST = "";
   private static final String COMPONENT_IQOO_WHITE_LIST = "com.iqoo.secure.ui.phoneoptimize.AddWhiteListActivity";
   private static final String COMPONENT_IQOO_BG_STARTUP = "com.iqoo.secure.ui.phoneoptimize.BgStartUpManager";
   private static final String PACKAGE_VIVO_MAIN = "com.vivo.permissionmanager";
@@ -112,7 +106,6 @@ public class AutoStartHelper {
    */
   private static final String BRAND_ONEPLUS = "oneplus";
   private static final String PACKAGE_ONEPLUS_MAIN = "com.oneplus.security";
-  private static final String TITLE_ONEPLUS_CHAIN_LAUNCH = "";
   private static final String COMPONENT_ONEPLUS_CHAIN_LAUNCH = "com.oneplus.security.chainlaunch.view.ChainLaunchAppListActivity";
 
   /**
@@ -121,7 +114,6 @@ public class AutoStartHelper {
    */
   private static final String BRAND_MEIZU = "meizu";
   private static final String PACKAGE_MEIZU_MAIN = "com.meizu.safe";
-  private static final String TITLE_MEIZU_SMART_BG = "后台管理";
   private static final String COMPONENT_MEIZU_SMART_BG = "com.meizu.safe.SmartBGActivity";
 
   /**
@@ -283,17 +275,17 @@ public class AutoStartHelper {
     }
   }
 
-  private boolean autoStart(Context context, @NonNull String mainPackage,
-                            @NonNull List<String> componentNameList, @Nullable PermissionCallback callback) {
-    return autoStart(context, true, mainPackage, componentNameList, callback);
+  private boolean autoStart(Context context, @Nullable PermissionCallback callback,
+                            @NonNull String packageName, @NonNull List<GuardPermissionPage> permissionPageList) {
+    return autoStart(context, true, callback, packageName, permissionPageList);
   }
 
-  private boolean autoStart(Context context, boolean allowStartHome, @NonNull String mainPackage,
-                            @NonNull List<String> componentNameList, @Nullable PermissionCallback callback) {
-    if (isPackageExists(context, mainPackage)) {
-      for (String componentName : componentNameList) {
+  private boolean autoStart(Context context, boolean allowStartHome, @Nullable PermissionCallback callback,
+                            @NonNull String packageName, @NonNull List<GuardPermissionPage> permissionPageList) {
+    if (isPackageExists(context, packageName)) {
+      for (GuardPermissionPage permissionPage : permissionPageList) {
         try {
-          startPermissionPage(context, mainPackage, componentName);
+          startPermissionPage(context, packageName, permissionPage.getComponentName());
           onStartPermissionPageSuccess(callback);
           return true;
         } catch (Exception e) {
@@ -301,13 +293,13 @@ public class AutoStartHelper {
         }
       }
 
-      if (!componentNameList.isEmpty()) {
+      if (!permissionPageList.isEmpty()) {
         onStartPermissionPageFailed(callback);
       }
 
       if (allowStartHome) {
         try {
-          startHomePage(context, mainPackage);
+          startHomePage(context, packageName);
           onStartHomePageSuccess(callback);
           return true;
         } catch (Exception e) {
@@ -324,21 +316,24 @@ public class AutoStartHelper {
   }
 
   private boolean autoStartHuawei(Context context, PermissionCallback callback) {
-    return autoStart(context, PACKAGE_HUAWEI_MAIN,
-        Arrays.asList(COMPONENT_HUAWEI_STARTUP, COMPONENT_HUAWEI_BOOST_START, COMPONENT_HUAWEI_PROTECT), callback);
+    return autoStart(context, callback, PACKAGE_HUAWEI_MAIN,
+        Arrays.asList(new GuardPermissionPage("自启管理", COMPONENT_HUAWEI_STARTUP),
+            new GuardPermissionPage("自启管理", COMPONENT_HUAWEI_BOOST_START),
+            new GuardPermissionPage("锁屏清理应用", COMPONENT_HUAWEI_PROTECT)));
   }
 
   private boolean autoStartXiaomi(Context context, PermissionCallback callback) {
-    return autoStart(context, PACKAGE_XIAOMI_MAIN, Collections.singletonList(COMPONENT_XIAOMI_AUTO_START), callback);
+    return autoStart(context, callback, PACKAGE_XIAOMI_MAIN,
+        Collections.singletonList(new GuardPermissionPage("自启动管理", COMPONENT_XIAOMI_AUTO_START)));
   }
 
   private boolean autoStartOppo(Context context, PermissionCallback callback) {
-    if (autoStart(context, false, PACKAGE_COLOROS_MAIN,
-        Arrays.asList(COMPONENT_COLOROS_STARTUP, COMPONENT_COLOROS_STARTUP_APP), callback)) {
+    if (autoStart(context, false, callback, PACKAGE_COLOROS_MAIN,
+        Arrays.asList(new GuardPermissionPage("自启动管理", COMPONENT_COLOROS_STARTUP), new GuardPermissionPage("自启动管理", COMPONENT_COLOROS_STARTUP_APP)))) {
       return true;
     }
-    if (autoStart(context, false, PACKAGE_OPPO_MAIN,
-        Collections.singletonList(COMPONENT_OPPO_STARTUP), callback)) {
+    if (autoStart(context, false, callback, PACKAGE_OPPO_MAIN,
+        Collections.singletonList(new GuardPermissionPage("自启动管理", COMPONENT_OPPO_STARTUP)))) {
       return true;
     }
     try {
@@ -360,12 +355,12 @@ public class AutoStartHelper {
   }
 
   private boolean autoStartVivo(Context context, PermissionCallback callback) {
-    if (autoStart(context, false, PACKAGE_IQOO_MAIN,
-        Arrays.asList(COMPONENT_IQOO_WHITE_LIST, COMPONENT_IQOO_BG_STARTUP), callback)) {
+    if (autoStart(context, false, callback, PACKAGE_IQOO_MAIN,
+        Arrays.asList(new GuardPermissionPage("", COMPONENT_IQOO_WHITE_LIST), new GuardPermissionPage("", COMPONENT_IQOO_BG_STARTUP)))) {
       return true;
     }
-    if (autoStart(context, false, PACKAGE_VIVO_MAIN,
-        Collections.singletonList(COMPONENT_VIVO_BG_STARTUP), callback)) {
+    if (autoStart(context, false, callback, PACKAGE_VIVO_MAIN,
+        Collections.singletonList(new GuardPermissionPage("", COMPONENT_VIVO_BG_STARTUP)))) {
       return true;
     }
     try {
@@ -387,30 +382,37 @@ public class AutoStartHelper {
   }
 
   private boolean autoStartOnePlus(Context context, PermissionCallback callback) {
-    return autoStart(context, PACKAGE_ONEPLUS_MAIN, Collections.singletonList(COMPONENT_ONEPLUS_CHAIN_LAUNCH), callback);
+    return autoStart(context, callback, PACKAGE_ONEPLUS_MAIN,
+        Collections.singletonList(new GuardPermissionPage("", COMPONENT_ONEPLUS_CHAIN_LAUNCH)));
   }
 
   private boolean autoStartMaizu(Context context, PermissionCallback callback) {
-    return autoStart(context, PACKAGE_MEIZU_MAIN, Collections.singletonList(COMPONENT_MEIZU_SMART_BG), callback);
+    return autoStart(context, callback, PACKAGE_MEIZU_MAIN,
+        Collections.singletonList(new GuardPermissionPage("后台管理", COMPONENT_MEIZU_SMART_BG)));
   }
 
   private boolean autoStartSmartisan(Context context, PermissionCallback callback) {
-    return autoStart(context, PACKAGE_SMARTISAN_MAIN, new ArrayList<String>(), callback);
+    return autoStart(context, callback, PACKAGE_SMARTISAN_MAIN,
+        new ArrayList<GuardPermissionPage>());
   }
 
   private boolean autoStartLetv(Context context, PermissionCallback callback) {
-    return autoStart(context, PACKAGE_LETV_MAIN, Collections.singletonList(PACKAGE_LETV_COMPONENT), callback);
+    return autoStart(context, callback, PACKAGE_LETV_MAIN,
+        Collections.singletonList(new GuardPermissionPage("", PACKAGE_LETV_COMPONENT)));
   }
 
   private boolean autoStartSamsung(Context context, PermissionCallback callback) {
-    return autoStart(context, PACKAGE_SAMSUNG_MAIN, Collections.singletonList(PACKAGE_SAMSUNG_COMPONENT), callback);
+    return autoStart(context, callback, PACKAGE_SAMSUNG_MAIN,
+        Collections.singletonList(new GuardPermissionPage("", PACKAGE_SAMSUNG_COMPONENT)));
   }
 
   private boolean autoStartNokia(Context context, PermissionCallback callback) {
-    return autoStart(context, PACKAGE_NOKIA_MAIN, Collections.singletonList(PACKAGE_NOKIA_COMPONENT), callback);
+    return autoStart(context, callback, PACKAGE_NOKIA_MAIN,
+        Collections.singletonList(new GuardPermissionPage("", PACKAGE_NOKIA_COMPONENT)));
   }
 
   private boolean autoStartAsus(Context context, PermissionCallback callback) {
-    return autoStart(context, PACKAGE_ASUS_MAIN, Arrays.asList(PACKAGE_ASUS_COMPONENT_POWER_SAVER, PACKAGE_ASUS_COMPONENT_AUTO_START), callback);
+    return autoStart(context, callback, PACKAGE_ASUS_MAIN,
+        Arrays.asList(new GuardPermissionPage("", PACKAGE_ASUS_COMPONENT_POWER_SAVER), new GuardPermissionPage("", PACKAGE_ASUS_COMPONENT_AUTO_START)));
   }
 }
