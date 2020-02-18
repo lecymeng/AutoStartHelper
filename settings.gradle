@@ -1,0 +1,2 @@
+include ':sample', ':autostarter'
+rootProject.name='AutoStartHelper'
