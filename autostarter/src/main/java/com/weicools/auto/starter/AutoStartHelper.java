@@ -114,7 +114,7 @@ public class AutoStartHelper {
    */
   private static final String BRAND_MEIZU = "meizu";
   private static final String PACKAGE_MEIZU_MAIN = "com.meizu.safe";
-  private static final String COMPONENT_MEIZU_SMART_BG = "com.meizu.safe.SmartBGActivity";
+  private static final String COMPONENT_MEIZU_SMART_BG = "com.meizu.safe.permission.SmartBGActivity";
 
   /**
    * Smartisan
