@@ -6,7 +6,7 @@ import android.widget.Toast
 import androidx.annotation.IntDef
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.weicools.auto.starter.AutoStartPermissionHelper
+import com.weicools.auto.starter.AutoStartHelper
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -27,13 +27,26 @@ class MainActivity : AppCompatActivity() {
     setContentView(R.layout.activity_main)
 
     val autoStartListener = View.OnClickListener {
-      val success = AutoStartPermissionHelper.getInstance().getAutoStartPermission(this@MainActivity)
-      var message = "Failed"
+      val success = AutoStartHelper.getInstance().getAutoStartPermission(this@MainActivity, object : AutoStartHelper.PermissionCallbackAdapter() {
+        override fun onStartHomePageSuccess() {
+          Toast.makeText(this@MainActivity, "跳转手机管家主页成功", Toast.LENGTH_SHORT).show()
+        }
+
+        override fun onStartHomePageFailed() {
+          Toast.makeText(this@MainActivity, "跳转手机管家主页失败", Toast.LENGTH_SHORT).show()
+        }
+
+        override fun onStartPermissionPageSuccess() {
+          Toast.makeText(this@MainActivity, "跳转自启动授权页成功", Toast.LENGTH_SHORT).show()
+        }
+
+        override fun onStartPermissionPageFailed() {
+          Toast.makeText(this@MainActivity, "跳转自启动授权页失败", Toast.LENGTH_SHORT).show()
+        }
+      })
       if (success) {
-        message = "Successful"
         currentTask = TASK_REQUEST_AUTO_START
       }
-      Toast.makeText(this@MainActivity, "Action $message", Toast.LENGTH_SHORT).show()
     }
 
     rlAutoStart.setOnClickListener(autoStartListener)
