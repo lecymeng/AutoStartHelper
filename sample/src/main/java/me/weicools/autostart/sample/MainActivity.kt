@@ -1,5 +1,6 @@
 package me.weicools.autostart.sample
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -49,7 +50,14 @@ class MainActivity : AppCompatActivity() {
       }
     }
 
-    rlAutoStart.setOnClickListener(autoStartListener)
+    val sp = getSharedPreferences(AutoBootReceiver.PREF_FILE_BOOT_INFO, Context.MODE_PRIVATE)
+    val receiveStatus = sp.getInt(AutoBootReceiver.PREF_KEY_RECEIVE_BOOT_ACTION_STATUS, AutoBootReceiver.RECEIVE_BOOT_ACTION_STATUS_UNKNOWN)
+    if (receiveStatus == AutoBootReceiver.RECEIVE_BOOT_ACTION_STATUS_SUCCESS) {
+      Toast.makeText(this, "AutoStart is enable", Toast.LENGTH_LONG).show()
+    } else {
+      Toast.makeText(this, "AutoStart is disable or unknown", Toast.LENGTH_LONG).show()
+      rlAutoStart.setOnClickListener(autoStartListener)
+    }
   }
 
   override fun onResume() {
