@@ -53,10 +53,12 @@ class MainActivity : AppCompatActivity() {
     val sp = getSharedPreferences(AutoBootReceiver.PREF_FILE_BOOT_INFO, Context.MODE_PRIVATE)
     val receiveStatus = sp.getInt(AutoBootReceiver.PREF_KEY_RECEIVE_BOOT_ACTION_STATUS, AutoBootReceiver.RECEIVE_BOOT_ACTION_STATUS_UNKNOWN)
     if (receiveStatus == AutoBootReceiver.RECEIVE_BOOT_ACTION_STATUS_SUCCESS) {
+      switchCompat.isChecked = true
       Toast.makeText(this, "AutoStart is enable", Toast.LENGTH_LONG).show()
     } else {
-      Toast.makeText(this, "AutoStart is disable or unknown", Toast.LENGTH_LONG).show()
+      switchCompat.isChecked = false
       rlAutoStart.setOnClickListener(autoStartListener)
+      Toast.makeText(this, "AutoStart is disable or unknown", Toast.LENGTH_LONG).show()
     }
   }
 
